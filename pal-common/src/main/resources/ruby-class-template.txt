@@ -18,15 +18,10 @@ module Pal
     #
     def {{name}}({{#signature.args}}{{name}}{{^last}}, {{/last}}{{/signature.args}})
         {{#body}}
-        {{toString}}
+        {{{value}}}
         {{/body}}
     end
     {{/functions}}
-
-
-    {{#builtin.map?}}
-    //builtin.map function required
-    {{/builtin.map?}}
 
 {{^functiononly}}
 end

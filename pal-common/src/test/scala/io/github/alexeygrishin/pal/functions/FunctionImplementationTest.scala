@@ -30,7 +30,7 @@ class FunctionImplementationTest extends FunSpec  {
     }
 
     it("shall call to translator if pal body was defined") {
-      val translator = mock(classOf[Translator])
+      val translator = mock(classOf[FunctionCompiler])
       when(translator.translate(any[List[Expression]], any[FunctionImplementation])).thenReturn(List("hello"))
       val func = new FunctionImplementation(functionStub("""{pal: [{"+": [1,2]}]} """))
       assert(List("hello") === func.getBody("java", translator))

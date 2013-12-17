@@ -1,12 +1,13 @@
 package io.github.alexeygrishin.pal
 
-import io.github.alexeygrishin.pal.codegen.{CodeGen, LangConfigs}
+import io.github.alexeygrishin.pal.codegen.{CodeGen}
 import java.io.{InputStreamReader, FileReader}
 import com.google.gson.Gson
 import io.github.alexeygrishin.pal.functions.FunctionJson
 import io.github.alexeygrishin.pal.storage.InMemoryStorage
 import com.google.gson.reflect.TypeToken
 import scala.collection.JavaConversions._
+import io.github.alexeygrishin.pal.codegen.langconfig.LangConfigs
 
 object TestRunner {
 
@@ -19,6 +20,6 @@ object TestRunner {
 
     val codeGen = new CodeGen(storage, langs.get)
     println(codeGen.composeClass("capitalizeAll", "java"))
-    //println(codeGen.composeClass("capitalize", "java"))
+    println(codeGen.composeClass("capitalizeAll", "ruby"))
   }
 }

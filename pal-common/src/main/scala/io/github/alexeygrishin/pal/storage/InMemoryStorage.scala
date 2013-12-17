@@ -1,6 +1,6 @@
 package io.github.alexeygrishin.pal.storage
 
-import io.github.alexeygrishin.pal.functions.{FunctionJson, FunctionInterface, FunctionImplementation}
+import io.github.alexeygrishin.pal.functions._
 
 class InMemoryStorage(jsons: List[FunctionJson]) extends FunctionsStorage {
 

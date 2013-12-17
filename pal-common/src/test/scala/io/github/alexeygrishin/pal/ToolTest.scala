@@ -2,8 +2,8 @@ package io.github.alexeygrishin.pal
 
 import org.scalatest.FunSpec
 import io.github.alexeygrishin.pal.functions._
-import com.google.gson.Gson
-import io.github.alexeygrishin.pal.codegen.{BuiltinHelper, JavaTypeMapper, RenderableFunction}
+import io.github.alexeygrishin.pal.codegen._
+import io.github.alexeygrishin.pal.codegen.lang.JavaLangHelper
 
 class ToolTest extends FunSpec {
 
@@ -12,7 +12,7 @@ class ToolTest extends FunSpec {
       val template = """public static {{signature.returns}} {{name}}({{#signature.args}}{{atype}} {{name}}{{^last}}, {{/last}}{{/signature.args}})"""
       val fj = Tool.readFunction(Data.palImplementationJson)
       val f = new FunctionImplementation(fj)
-      val rf = new RenderableFunction(f, new JavaTypeMapper(new BuiltinHelper {}))
+      val rf = new RenderableFunction(f, new JavaLangHelper(new BuiltinHelper {}))
       assert("public static int sum(int a1, int a2)" === Tool.mustache(template, rf))
     }
   }

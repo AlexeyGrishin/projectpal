@@ -3,6 +3,7 @@
 //:package
 package pal;
 //:imports
+import java.util.*;
 {{#imports}}
 import {{value}}
 {{/imports}}
@@ -19,24 +20,43 @@ class Pal {
      **/
     public static {{signature.returns}} {{name}}({{#signature.args}}{{atype}} {{name}}{{^last}}, {{/last}}{{/signature.args}}) {
         {{#body}}
-        {{#last}}return {{/last}}{{{toString}}}
+        {{#last}}return {{/last}}{{{value}}};
         {{/body}}
     }
 
-    public static final Func<{{#signature.args}}{{atype}}, {{/signature.args}}{{signature.returns}}> {{name}}AsFunction = new Func<> {
+    public static final Func<{{#signature.args}}{{atype}}, {{/signature.args}}{{signature.returns}}> {{name}}AsFunction = new Func<{{#signature.args}}{{atype}}, {{/signature.args}}{{signature.returns}}>() {
         public {{signature.returns}} act({{#signature.args}}{{atype}} {{name}}{{^last}}, {{/last}}{{/signature.args}}) {
             return {{name}}({{#signature.args}}{{name}}{{^last}}, {{/last}}{{/signature.args}});
         }
-    }
+    };
 
     {{/functions}}
 
     {{#builtin.map/2}}
-    //builtin.map function required
+    public static <A1, R> Collection<R> map(Collection<A1> list, Func<A1, R> action) {
+        List<R> result = new ArrayList<R>(list.size());
+        for (A1 s: list) {
+            result.add(action.act(s));
+        }
+        return result;
+    }
     {{/builtin.map/2}}
 
+    {{#builtin.join/2}}
+    public static <A1> String join(Collection<A1> list, String separator) {
+        StringBuilder bld = new StringBuilder();
+        boolean first = true;
+        for (A1 s: list) {
+            if (!first) bld.append(separator);
+            bld.append(s.toString());
+            first = false;
+        }
+        return bld.toString();
+    }
+    {{/builtin.join/2}}
+
     public static interface Func<A1, R> {
-        R act(A1 arg1)
+        R act(A1 arg1);
     }
 
 {{^functiononly}}

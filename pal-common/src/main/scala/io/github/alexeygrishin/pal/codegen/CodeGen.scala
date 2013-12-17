@@ -3,8 +3,7 @@ package io.github.alexeygrishin.pal.codegen
 import io.github.alexeygrishin.pal.storage.FunctionsStorage
 import io.github.alexeygrishin.pal.functions._
 import java.io.StringWriter
-import scala.collection.JavaConversions._
-import scala.collection.mutable.ListBuffer
+import io.github.alexeygrishin.pal.codegen.langconfig.{TemplatedBuiltin, LangConfig}
 
 class CodeGen(private val storage: FunctionsStorage, private val getLangConfig: (String) => Option[LangConfig]) {
 
@@ -12,11 +11,10 @@ class CodeGen(private val storage: FunctionsStorage, private val getLangConfig: 
     val function = storage.get(funcName).getOrElse(throw new UnknownEntityException("function", funcName))
     val langConfig = getLangConfig(langName).getOrElse(throw new UnknownEntityException("language", langName))
     val allDependencies = resolveDependencies(function)
-    //include builtin
     val allFunctions = allDependencies.registryFunctions
     val allBuiltinToInclude = allDependencies.builtinFunctions.filter((x) => langConfig.getBuiltin(x.id).isInstanceOf[TemplatedBuiltin])
     val classToRender = new RenderableClass(
-      allFunctions.map(langConfig.render(_)),
+      allFunctions.map(langConfig.prepareFunction(_)),
       allBuiltinToInclude.map(_.id)
     )
     renderClass(classToRender, langConfig)
@@ -25,14 +23,14 @@ class CodeGen(private val storage: FunctionsStorage, private val getLangConfig: 
   def composeFunction(funcName: String, langName: String) = {
     val function = storage.get(funcName).getOrElse(throw new UnknownEntityException("function", funcName))
     val langConfig = getLangConfig(langName).getOrElse(throw new UnknownEntityException("language", langName))
-    val classToRender = new RenderableClass(langConfig.render(function))
+    val classToRender = new RenderableClass(langConfig.prepareFunction(function))
     renderClass(classToRender, langConfig)
 
   }
 
   private def renderClass(classToRender: RenderableClass, langConfig: LangConfig) = {
     val strWriter = new StringWriter
-    langConfig.render(classToRender, strWriter)
+    langConfig.renderClassBody(classToRender, strWriter)
     strWriter.flush()
     strWriter.toString
   }
@@ -57,26 +55,3 @@ class CodeGen(private val storage: FunctionsStorage, private val getLangConfig: 
 }
 
 
-class Dependencies2 {
-  val builtinFunctions: ListBuffer[String] = new ListBuffer[String]
-  val registryFunctions: ListBuffer[FunctionImplementation] = new ListBuffer[FunctionImplementation]
-
-  def knownDependencies = builtinFunctions ++ registryFunctions.map(_.name)
-
-}
-
-class Dependencies(val builtinFunctions: List[BuiltinFunctionDependency], val registryFunctions: List[FunctionImplementation]) {
-  val knownDependencies = List.empty[Dependency] ++ builtinFunctions ++ registryFunctions.map {x => new RegistryFunctionDependency(x.name)}
-  def ++(that: Dependencies) = new Dependencies(builtinFunctions ++ that.builtinFunctions, registryFunctions ++ that.registryFunctions)
-}
-
-sealed abstract case class Dependency() {
-  def onlyIf[T](cls: Class[T]): List[T] = cls.isInstance(this) match {
-    case true => List(this.asInstanceOf[T])
-    case _ => List.empty
-  }
-}
-
-case class RegistryFunctionDependency(id: String) extends Dependency
-case class BuiltinFunctionDependency(id: String) extends Dependency
-case class OperatorDependency(id: String) extends Dependency

@@ -1,15 +1,12 @@
 package io.github.alexeygrishin.pal.functions
 
-import com.google.gson.{JsonObject, JsonElement}
-import scala.collection.mutable
 import java.util
 
 class FunctionJson {
+  type ImplementationJson = java.util.HashMap[String, util.ArrayList[Object]]
   var name: String = ""
-
   var interface: InterfaceJson = null
-  var implementation: java.util.HashMap[String, util.ArrayList[Object]] = null
-
+  var implementation: ImplementationJson = null
 }
 
 class InterfaceJson {

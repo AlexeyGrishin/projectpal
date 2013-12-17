@@ -1,17 +1,14 @@
 package io.github.alexeygrishin.pal.codegen
 
-import io.github.alexeygrishin.pal.functions.{AType, Translator, FunctionImplementation}
+import io.github.alexeygrishin.pal.functions._
 import io.github.alexeygrishin.pal.functions.expressions._
 
-//TODO: reduce traits
-trait TypeMapper extends Translator{
+trait LangHelper extends FunctionCompiler{
   def mapType(tp: AType): String = tp.name
   def getLangName: String = null
 }
 
-
-//TODO: rename
-abstract class DefaultTypeMapper extends TypeMapper {
+abstract class DefaultLangHelper(private val helper: BuiltinHelper) extends LangHelper {
 
   type ExpressionParsingContext = FunctionImplementation
 
@@ -27,7 +24,6 @@ abstract class DefaultTypeMapper extends TypeMapper {
   }
 
   protected def build(builder: StringBuilder, ctx: ExpressionParsingContext, expr: Expression) {
-    //TODO: how to be sure that if someone adds new type this method falls on compile?
     expr match {
       case i: IntConstant => appendIntConstant(builder, ctx, i)
       case d: DoubleConstant => appendDoubleConstant(builder, ctx, d)
@@ -66,13 +62,23 @@ abstract class DefaultTypeMapper extends TypeMapper {
   }
 
   protected def appendOperator(builder: StringBuilder, ctx: ExpressionParsingContext, op: Operator, build: ( Expression) => Unit) {
-    build(op.left)
-    builder.append(op.name)
-    build(op.right)
+    helper.onOperator(op) match {
+      case op: Operator =>
+        build(op.left)
+        builder.append(op.name)
+        build(op.right)
+      case e: Expression =>
+        build(e)
+    }
   }
 
-  protected def appendBuiltinFunctionCall(builder: StringBuilder, ctx: ExpressionParsingContext, bfc: BuiltinFunctionCall)
+  protected def appendBuiltinFunctionCall(builder: StringBuilder, ctx: ExpressionParsingContext, bfc: BuiltinFunctionCall) {
+    helper.onBuiltin(bfc) match {
+      case bf: BuiltinFunctionCall => builder.append("TODO") //TODO: throw exception
+      case e: Expression => build(builder, ctx, e)
+    }
 
+  }
   protected def appendFunctionRef(builder: StringBuilder, ctx: ExpressionParsingContext, fr: FunctionRef)
 
   protected def appendArgumentRef(builder: StringBuilder, ctx: ExpressionParsingContext, a: ArgumentRef) {

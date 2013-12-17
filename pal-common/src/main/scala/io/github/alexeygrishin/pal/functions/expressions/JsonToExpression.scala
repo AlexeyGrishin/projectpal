@@ -1,6 +1,5 @@
 package io.github.alexeygrishin.pal.functions.expressions
 
-import java.util.regex.Pattern
 import scala.collection.JavaConversions._
 
 object JsonToExpression {

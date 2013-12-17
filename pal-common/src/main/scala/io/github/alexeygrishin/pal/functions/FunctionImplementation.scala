@@ -1,75 +1,30 @@
 package io.github.alexeygrishin.pal.functions
+
 import scala.collection.JavaConversions._
 import io.github.alexeygrishin.pal.functions.expressions._
-import io.github.alexeygrishin.pal.codegen._
 
-
-class FunctionInterface(json: FunctionJson) {
-  val name = json.name
-  val description = json.interface.description
-  val tags = json.interface.tags
-  val signature = new Signature(name, json.interface)
-
-
-  def canEqual(other: Any): Boolean = other.isInstanceOf[FunctionInterface]
-
-  override def equals(other: Any): Boolean = other match {
-    case that: FunctionInterface =>
-      (that canEqual this) &&
-        name == that.name
-    case _ => false
-  }
-
-  override def hashCode(): Int = {
-    val state = Seq(name)
-    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
-  }
-}
-
-class FunctionImplementation(json: FunctionJson) extends FunctionInterface(json) {
-  private val implementation = new Implementation(json.implementation.map ((x) => {x._1 -> x._2.toList }))
-
-  def getBody(langName: String, translator: Translator): List[String] = implementation.forLanguage(langName, new ExpressionCompiler {
-    def compile(expressions: List[Expression]): List[String] = translator.translate(expressions, FunctionImplementation.this)
-  })
-
-  def getArgumentName(num: Int) = signature.args(num - 1).name
-
-  //TODO: store and cache list of dependencies
-  def getDependencies = implementation.getDependencies
-}
-
-
-
-
-class Signature(val name: String, interf: InterfaceJson) {
-  val returns = AType(interf.rettype)
-  val args = interf.args.entrySet().toList.map {new Argument(_)}
-}
-
-class Argument(pair: java.util.Map.Entry[String, String]) {
-  val name = pair.getKey
-  val value = AType(pair.getValue)
-}
-
-class Implementation(impl: java.util.Map[String, List[_]]) {
-  val languages = impl.toMap.map ((pair) => pair._1 -> (pair._2(0) match { //TODO: match another way
-    case p: java.lang.String => new RegularLanguageImplementation(pair._1, pair._2.asInstanceOf[List[String]])
-    case p: Any => new TranslatableLanguageImplementation(pair._1, pair._2)
-  }))
-
-  def forLanguage(lang: String, translator: ExpressionCompiler) = languages.values.map(_.get(lang, translator)).find(!_.isEmpty).getOrElse(throw new IllegalArgumentException("Cannot translate function to language " + lang))
-
-  def getDependencies = languages.values.map(_.getDependencies).flatten
-}
-
-trait Translator {
-  def translate(expressions: List[Expression], function: FunctionImplementation): List[String] = null
-}
 
 trait ExpressionCompiler {
   def compile(expressions: List[Expression]): List[String]
 }
+
+class FunctionImplementation(json: FunctionJson) extends FunctionInterface(json) {
+  private val languages = json.implementation.map ((pair) => pair._1 -> (pair._2.get(0) match {
+    case p: java.lang.String => new RegularLanguageImplementation(pair._1, pair._2.toList.asInstanceOf[List[String]])
+    case p: Any => new TranslatableLanguageImplementation(pair._1, pair._2.toList)
+  }))
+
+  def getBody(langName: String, translator: FunctionCompiler): List[String] =
+    languages.values.map(_.get(langName, bind(translator))).find(!_.isEmpty).getOrElse(throw new IllegalArgumentException("Cannot translate function to language " + langName))
+
+  //TODO: store and cache list of dependencies
+  def getDependencies = languages.values.map(_.getDependencies).flatten
+
+  private def bind(translator: FunctionCompiler): ExpressionCompiler = new ExpressionCompiler {
+    def compile(expressions: List[Expression]) = translator.translate(expressions, FunctionImplementation.this)
+  }
+}
+
 
 abstract class LanguageImplementation {
   def get(langName: String, translator: ExpressionCompiler): List[String]

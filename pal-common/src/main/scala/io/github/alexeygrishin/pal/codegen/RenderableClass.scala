@@ -1,8 +1,9 @@
 package io.github.alexeygrishin.pal.codegen
 
 import scala.collection.JavaConversions._
-import io.github.alexeygrishin.pal.functions.{AType, Translator, FunctionImplementation, Signature}
+import io.github.alexeygrishin.pal.functions._
 import com.github.mustachejava.util.DecoratedCollection
+import io.github.alexeygrishin.pal.Tool._
 
 
 class RenderableClass(functionsList: List[RenderableFunction], val functiononly: Boolean = false, builtinsToInclude: List[String] = List.empty) {
@@ -12,21 +13,19 @@ class RenderableClass(functionsList: List[RenderableFunction], val functiononly:
   val builtin = mapAsJavaMap(builtinsToInclude.map(_ -> true).toMap)
 }
 
-class RenderableArgument(val name: String, val atype: String, val last: Boolean) {
+class RenderableArgument(val name: String, val atype: String, val last: Boolean)
 
-}
-
-class RenderableSignature(signature: Signature, mapper: TypeMapper) {
+class RenderableSignature(signature: Signature, mapper: LangHelper) {
   val name = signature.name
   val returns = mapper.mapType(signature.returns)
   val args = seqAsJavaList(signature.args.zipWithIndex.map({case (x, idx) => new RenderableArgument(x.name, mapper.mapType(x.value), idx == signature.args.size - 1 )}))
 }
 
-class RenderableFunction(func: FunctionImplementation, mapper: TypeMapper) {
+class RenderableFunction(func: FunctionImplementation, mapper: LangHelper) {
   val name = func.name
   val description = func.description
-  val tags = new DecoratedCollection(asJavaCollection(func.tags))
+  val tags: DecoratedCollection[String] = list2decorated(func.tags)
   val signature = new RenderableSignature(func.signature, mapper)
-  val body = asJavaCollection(func.getBody(mapper.getLangName, mapper)) //TODO: just transfer mapper. and rename it!
+  val body: DecoratedCollection[String] = list2decorated(func.getBody(mapper.getLangName, mapper))
 }
 
