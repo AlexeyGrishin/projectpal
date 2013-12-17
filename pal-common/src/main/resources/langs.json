@@ -1,0 +1,32 @@
+{
+    java: {
+        classTemplateFile: "java-class-template.txt",
+        generator: "io.github.alexeygrishin.pal.codegen.JavaCodeGenerator",
+        builtin: {
+            "substring/2":      "$1.substring($2)",
+            "substring/3":      "$1.substring($2, $3)",
+            "uppercase/1":      "$1.toUpperCase()",
+            "map/2":            {template: true},
+            "split/2":          "$1.split($2)",
+            "join/2":           {template: true},
+            "+":                "$1 + $2",
+            "-":                "$1 - $2",
+            "*":                "$1 * $2",
+            "/":                "$1 / $2"
+        }
+    },
+    ruby: {
+        classTemplateFile: "ruby-class-template.txt",
+        generator: "io.github.alexeygrishin.pal.codegen.RubyCodeGenerator",
+        builtin: {
+            "substring/2":      "$1.substring($2)",
+            "substring/3":      "$1.substring($2, $3)",
+            "uppercase/1":      "$1.toupper",
+            "map/2":            "$1.map($2)",
+            "+":                "$1 + $2",
+            "-":                "$1 - $2",
+            "*":                "$1 * $2",
+            "/":                "$1 / $2"
+        }
+    }
+}

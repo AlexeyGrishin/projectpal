@@ -1,0 +1,34 @@
+[
+{
+    name: "capitalize",
+    interface: {
+        "tags": ["string", "capitalize"],
+        "description": "Capitalizes provided string. Note that only first word will be capitalized",
+        "rettype": "string",
+        "args": {string: "string"}
+    },
+    implementation: {
+        "pal": [
+            {"+": [
+                {"@uppercase": [{"@substring": ["$1", 0, 1]}]},
+                {"@substring": ["$1", 1]}
+            ]
+            }
+        ]
+    }
+},
+{
+    name: "capitalizeAll",
+    interface: {
+        "tags": ["string", "capitalize", "all words"],
+        "description": "Capitalizes all words in the provided string",
+        "rettype": "string",
+        "args": {string: "string"}
+    },
+    implementation: {
+        "pal": [
+            {"@join": [{"@map": [{"@split": ["$1", " "]}, {_ref: "capitalize"}]}, " "]}
+        ]
+    }
+}
+]
