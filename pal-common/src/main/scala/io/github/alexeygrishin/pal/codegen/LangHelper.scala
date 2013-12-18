@@ -4,7 +4,7 @@ import io.github.alexeygrishin.pal.functions._
 import io.github.alexeygrishin.pal.functions.expressions._
 
 trait LangHelper extends FunctionCompiler {
-  def mapType(tp: AType): String = tp.name
+  def mapType(tp: AType): String = null
   def getLangName: String = null
 }
 

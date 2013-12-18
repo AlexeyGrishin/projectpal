@@ -1,7 +1,7 @@
 package io.github.alexeygrishin.pal.codegen.prepare
 
 import io.github.alexeygrishin.pal.functions.expressions._
-import io.github.alexeygrishin.pal.functions.AType
+import io.github.alexeygrishin.pal.functions.{AComplexType, ASimpleType, AType}
 import io.github.alexeygrishin.pal.codegen._
 
 
@@ -11,12 +11,13 @@ class JavaLangHelper(private val helper: BuiltinHelper) extends DefaultLangHelpe
   //TODO: type maps --> json
   override def mapType(tp: AType): String = {
     tp match {
-      case AType("int") => "int"
-      case AType("string") => "String"
-      case AType("boolean") => "boolean"
-      case AType("double") => "double"
-      case AType("list[string]") => "Collection<String>"  //TODO: process lists, maps, etc
-      case AType(x) => x
+      case ASimpleType("int") => "int"
+      case ASimpleType("string") => "String"
+      case ASimpleType("boolean") => "boolean"
+      case ASimpleType("double") => "double"
+      case ASimpleType(x) => x
+      case AComplexType("list", List(x)) => "Collection<" + mapType(x) + ">"
+      case AComplexType("map", List(x, y)) => "Map<" + mapType(x) + "," + mapType(y) + ">"
     }
   }
 
