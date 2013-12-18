@@ -18,44 +18,54 @@ class ExactCodeTemplate(private val template: String, val arguments: List[Expres
       }
     }
   }
+  override def toString: String = {
+    val bld = new StringBuilder
+    build(bld, (e) => bld.append(e.toString))
+    "<ExactCode>(" + bld.toString + ")"
+  }
 
 }
 
 class Operator(val name: String, val left: Expression, val right: Expression) extends Expression {
-  override def toString: String = left.toString + " " + name + " " + right.toString
+  override def toString: String = "<Operator " + name + ">(" + left.toString + ", " + right.toString + ")"
   override def children = List(left, right)
 }
 
 class FunctionCall(val name: String, val arguments: Iterable[Expression])     extends Expression  {
-  override def toString: String = name + "(" + arguments.map(_.toString).reduce(_ + "," + _)
+  override def toString: String = "<FunctionCall " + name + ">(" + arguments.map(_.toString).reduce(_ + ", " + _) + ")"
   override def children = arguments.toList
 }
 
 class FunctionRef(val name: String) extends Expression {
-  override def toString: String = "&" + name
+  override def toString: String = "<FunctionRef " + name + ">"
 }
 
 class BuiltinFunctionCall(fullName: String, val arguments: Iterable[Expression])     extends Expression  {
   val name = fullName.substring(1)
-  override def toString: String = "!" + name + "(" + arguments.map(_.toString).reduce(_ + "," + _)
+  override def toString: String = "<BuiltinFunctionCall " + name + ">(" + arguments.map(_.toString).reduce(_ + ", " + _) + ")"
   override def children = arguments.toList
   val id = name + "/" + arguments.size
 }
 
 class StringConstant(val value: String) extends Expression {
-  override def toString: String = "\"" + value + "\""
+  override def toString: String = "<String \"" + value + "\">"
 }
 class IntConstant(val value: Int) extends Expression {
-  override def toString: String = value.toString
+  override def toString: String = "<Int " + value.toString + ">"
 }
 class DoubleConstant(val value: Double) extends Expression {
-  override def toString: String = value.toString
+  override def toString: String = "<Double " + value.toString + ">"
 }
 class BoolConstant(val value: Boolean) extends Expression {
-  override def toString: String = value.toString
+  override def toString: String = "<Bool " + value.toString + ">"
 }
 
 class ArgumentRef(val number: Int) extends Expression {
-  override def toString: String = "<" + number + ">"
+  override def toString: String = "<ArgumentRef " + number + ">"
+}
+
+class Condition(val condition: Expression, val executeIfTrue: Expression) extends Expression {
+  override def children = List(condition, executeIfTrue)
+  override def toString: String = "<If (" + condition.toString + ")>(" + executeIfTrue.toString + ")"
 }
 

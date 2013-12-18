@@ -2,6 +2,7 @@ package io.github.alexeygrishin.pal.functions
 
 import scala.collection.JavaConversions._
 
+//TODO: test getArgumentName, equal/hashCode
 class FunctionInterface(json: FunctionJson) {
   val name = json.name
   val description = json.interface.description

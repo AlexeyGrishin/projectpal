@@ -8,6 +8,7 @@ trait ExpressionCompiler {
   def compile(expressions: List[Expression]): List[String]
 }
 
+//TODO: test getDependencies
 class FunctionImplementation(json: FunctionJson) extends FunctionInterface(json) {
   private val languages = json.implementation.map ((pair) => pair._1 -> (pair._2.get(0) match {
     case p: java.lang.String => new RegularLanguageImplementation(pair._1, pair._2.toList.asInstanceOf[List[String]])

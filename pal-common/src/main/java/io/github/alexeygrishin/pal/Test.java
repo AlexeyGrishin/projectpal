@@ -25,4 +25,24 @@ public class Test {
     public static interface Func<A1, R> {
         R act(A1 arg1);
     }
+
+    public static <T> T listGet(Collection<T> input, int nr) {
+        List<T> list = new ArrayList<T>(input);
+        return list.size() - 1 > nr ? null : list.get(nr);
+    }
+
+    public static <T> T listLast(Collection<T> input) {
+        return listGet(input, input.size() - 1);
+    }
+
+    public static <T> T listFirst(Collection<T> input) {
+        return listGet(input, 0);
+    }
+
+    public static <T> Collection<T> listRest(Collection<T> input) {
+        List<T> list = new ArrayList<T>(input);
+        list.remove(0);
+        return list;
+    }
+
 }

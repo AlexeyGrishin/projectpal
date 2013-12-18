@@ -7,7 +7,3 @@ trait BuiltinHelper {
   def onOperator(op: Operator): Expression = op
   def onBuiltin(bi: BuiltinFunctionCall): Expression = bi
 }
-
-abstract class LangGenerator {
-   def prepare(func: FunctionImplementation, helper: BuiltinHelper): RenderableFunction
- }

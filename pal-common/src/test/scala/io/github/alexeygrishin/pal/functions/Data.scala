@@ -17,4 +17,15 @@ object Data {
       |}
     """.stripMargin
 
+  val emptyInterface =
+    """
+      | interface: {tags: [], description: "", rettype: "int", args: {a1: "int"}}
+    """.stripMargin
+
+  def name(id: String) = "name: \"" + id + "\""
+
+  def implementationPal(impl: String) = "implementation: {pal: [" + impl + "]}"
+
+  def fjson(parts: String*) = "{" + parts.reduce(_ + "," + _) + "}"
+
 }

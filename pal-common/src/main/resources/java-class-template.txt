@@ -18,14 +18,14 @@ class Pal {
      *
      * @tags {{#tags}}{{value}}{{^last}}, {{/last}}{{/tags}}
      **/
-    public static {{signature.returns}} {{name}}({{#signature.args}}{{atype}} {{name}}{{^last}}, {{/last}}{{/signature.args}}) {
+    public static {{{signature.returns}}} {{name}}({{#signature.args}}{{{atype}}} {{name}}{{^last}}, {{/last}}{{/signature.args}}) {
         {{#body}}
         {{#last}}return {{/last}}{{{value}}};
         {{/body}}
     }
 
-    public static final Func<{{#signature.args}}{{atype}}, {{/signature.args}}{{signature.returns}}> {{name}}AsFunction = new Func<{{#signature.args}}{{atype}}, {{/signature.args}}{{signature.returns}}>() {
-        public {{signature.returns}} act({{#signature.args}}{{atype}} {{name}}{{^last}}, {{/last}}{{/signature.args}}) {
+    public static final Func{{signature.args.size}}<{{#signature.args}}{{{atype}}}, {{/signature.args}}{{{signature.returns}}}> {{name}}AsFunction = new Func{{signature.args.size}}<{{#signature.args}}{{{atype}}}, {{/signature.args}}{{{signature.returns}}}>() {
+        public {{{signature.returns}}} act({{#signature.args}}{{{atype}}} {{name}}{{^last}}, {{/last}}{{/signature.args}}) {
             return {{name}}({{#signature.args}}{{name}}{{^last}}, {{/last}}{{/signature.args}});
         }
     };
@@ -33,16 +33,18 @@ class Pal {
     {{/functions}}
 
     {{#builtin.map/2}}
-    public static <A1, R> Collection<R> map(Collection<A1> list, Func<A1, R> action) {
+    //:builtin map/2
+    public static <A1, R> Collection<R> map(Collection<A1> list, Func1<A1, R> action) {
         List<R> result = new ArrayList<R>(list.size());
         for (A1 s: list) {
             result.add(action.act(s));
         }
         return result;
     }
-    {{/builtin.map/2}}
 
+    {{/builtin.map/2}}
     {{#builtin.join/2}}
+    //:builtin join/2
     public static <A1> String join(Collection<A1> list, String separator) {
         StringBuilder bld = new StringBuilder();
         boolean first = true;
@@ -53,11 +55,49 @@ class Pal {
         }
         return bld.toString();
     }
-    {{/builtin.join/2}}
 
-    public static interface Func<A1, R> {
+    {{/builtin.join/2}}
+    {{#builtin.listLast/1}}
+    //:builtin listLast/1
+    public static <T> T listLast(Collection<T> input) {
+        return listGet(input, input.size() - 1);
+    }
+
+    {{/builtin.listLast/1}}
+    {{#builtin.listFirst/1}}
+    //:builtin listFirst/1
+    public static <T> T listFirst(Collection<T> input) {
+        return listGet(input, 0);
+    }
+
+    {{/builtin.listFirst/1}}
+    {{#builtin.listRest/1}}
+    //:builtin listRest/1
+    public static <T> Collection<T> listRest(Collection<T> input) {
+        List<T> list = new ArrayList<T>(input);
+        list.remove(0);
+        return list;
+    }
+
+    {{/builtin.listRest/1}}
+    //:permanent
+    public static interface Func1<A1, R> {
         R act(A1 arg1);
     }
+
+    public static interface Func2<A1, A2, R> {
+        R act(A1 arg1, A2 arg2);
+    }
+
+    public static interface Func3<A1, A2, A3, R> {
+        R act(A1 arg1, A2 arg2, A3 arg3);
+    }
+
+    public static <T> T listGet(Collection<T> input, int nr) {
+        List<T> list = new ArrayList<T>(input);
+        return nr > list.size() - 1 ? null : list.get(nr);
+    }
+
 
 {{^functiononly}}
 }

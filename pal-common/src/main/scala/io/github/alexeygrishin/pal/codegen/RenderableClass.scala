@@ -6,6 +6,7 @@ import com.github.mustachejava.util.DecoratedCollection
 import io.github.alexeygrishin.pal.Tool._
 
 
+//TODO: test constructors, check collections are java ones, not scala
 class RenderableClass(functionsList: List[RenderableFunction], val functiononly: Boolean = false, builtinsToInclude: List[String] = List.empty) {
   def this(function: RenderableFunction) = this(List(function), true)
   def this(functionsList: List[RenderableFunction], builtinsToInclude: List[String]) = this(functionsList, false, builtinsToInclude)

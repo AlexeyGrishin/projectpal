@@ -38,12 +38,5 @@ class FunctionImplementationTest extends FunSpec  {
 
   }
 
-  describe("JsonToExpression") {
-    it("shall work") {
-      val data = Tool.readFunction(Data.palImplementationJson).implementation.get("pal") .get(0)
-      val expr = JsonToExpression(data)
-      println(expr.toString())
-    }
-  }
 
 }

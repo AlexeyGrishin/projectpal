@@ -1,22 +1,30 @@
 {
     java: {
         classTemplateFile: "java-class-template.txt",
-        generator: "io.github.alexeygrishin.pal.codegen.lang.JavaCodeGenerator",
+        generator:  "io.github.alexeygrishin.pal.codegen.prepare.JavaSpecificPreparer",
+        helper:     "io.github.alexeygrishin.pal.codegen.prepare.JavaLangHelper",
         builtin: {
             "substring/2":      "$1.substring($2)",
             "substring/3":      "$1.substring($2, $3)",
             "uppercase/1":      "$1.toUpperCase()",
             "map/2":            {template: true},
             "split/2":          "Arrays.asList($1.split($2))",
-            "join/2":           {template: true}
+            "join/2":           {template: true},
+            "listSize/1":       "$1.size()",
+            "listFirst/1":      {template: true},
+            "listLast/1":       {template: true},
+            "listRest/1":       {template: true},
+            "_if/2":            "if ($1) return $2"
         },
         operators: {
-            "+":                "$1 + $2"
+            "+":                "$1 + $2",
+            "=":                "$1 == $2"
         }
     },
     ruby: {
         classTemplateFile: "ruby-class-template.txt",
-        generator: "io.github.alexeygrishin.pal.codegen.lang.RubyCodeGenerator",
+        generator:  "io.github.alexeygrishin.pal.codegen.prepare.RubySpecificPreparer",
+        helper:     "io.github.alexeygrishin.pal.codegen.prepare.RubyLangHelper",
         builtin: {
             "substring/2":      "$1.substring($2)",
             "substring/3":      "$1.substring($2, $3)",

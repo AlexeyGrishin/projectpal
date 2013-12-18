@@ -3,7 +3,7 @@ package io.github.alexeygrishin.pal.codegen
 import io.github.alexeygrishin.pal.functions._
 import io.github.alexeygrishin.pal.functions.expressions._
 
-trait LangHelper extends FunctionCompiler{
+trait LangHelper extends FunctionCompiler {
   def mapType(tp: AType): String = tp.name
   def getLangName: String = null
 }
@@ -34,12 +34,18 @@ abstract class DefaultLangHelper(private val helper: BuiltinHelper) extends Lang
       case bfc: BuiltinFunctionCall => appendBuiltinFunctionCall(builder, ctx, bfc)
       case op: Operator => appendOperator(builder, ctx, op, build(builder, ctx, _))
       case ec: ExactCodeTemplate => appendExactCodeTemplate(builder, ctx, ec, build(builder, ctx, _))
+      case ic: Condition => appendCondition(builder, ctx, ic, build(builder, ctx, _))
       case fc: FunctionCall =>
         appendFunctionCallBegin(builder, ctx, fc)
         appendFunctionCallArgs(builder, ctx, fc, build(builder, ctx, _))
         appendFunctionCallEnd(builder, ctx, fc)
     }
   }
+
+  protected def appendCondition(builder: StringBuilder, ctx: ExpressionParsingContext, ic: Condition, build: ( Expression) => Unit) {
+    //TODO: there shall be several expressions under condition - expressions block. last one shall be processed as function's last one
+  }
+
 
   protected def appendExactCodeTemplate(builder: StringBuilder, ctx: ExpressionParsingContext, ec: ExactCodeTemplate, build: ( Expression) => Unit) {
     ec.build(builder, build)

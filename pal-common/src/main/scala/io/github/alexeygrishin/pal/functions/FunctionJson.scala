@@ -13,7 +13,7 @@ class InterfaceJson {
   var description: String = ""
   var tags: Array[String] = new Array[String](0)
   var rettype: String = ""
-  var args: java.util.HashMap[String, String] = new java.util.HashMap[String, String]()
+  var args: java.util.LinkedHashMap[String, String] = new java.util.LinkedHashMap[String, String]()
   var dependencies: Array[String] = new Array[String](0)
 }
 

@@ -1,4 +1,4 @@
-package io.github.alexeygrishin.pal.codegen.lang
+package io.github.alexeygrishin.pal.codegen.prepare
 
 import io.github.alexeygrishin.pal.functions.{AType, FunctionImplementation}
 import io.github.alexeygrishin.pal.functions.expressions.FunctionRef
@@ -10,13 +10,6 @@ class RubyLangHelper(private val helper: BuiltinHelper) extends DefaultLangHelpe
   override def getLangName: String = "ruby"
 
   protected def appendFunctionRef(builder: StringBuilder, ctx: ExpressionParsingContext, fr: FunctionRef) {
-    builder.append(":").append(fr.name)
+    builder.append("&:").append(fr.name)
   }
-}
-
-
-class RubyCodeGenerator extends LangGenerator {
-
-  def prepare(function: FunctionImplementation, builtinHelper: BuiltinHelper): RenderableFunction = new RenderableFunction(function, new RubyLangHelper(builtinHelper))
-
 }

@@ -1,4 +1,4 @@
-package io.github.alexeygrishin.pal.codegen
+package io.github.alexeygrishin.pal.codegen.prepare
 
 import io.github.alexeygrishin.pal.functions._
 

@@ -1,9 +1,8 @@
 package io.github.alexeygrishin.pal.functions
 
 import org.scalatest.FunSpec
-import com.google.gson.Gson
-import java.util
 import io.github.alexeygrishin.pal.Tool
+import scala.collection.JavaConversions._
 
 class FunctionImplementationJsonTest extends FunSpec {
 
@@ -29,11 +28,8 @@ class FunctionImplementationJsonTest extends FunSpec {
     it("shall load function signature") {
       val loaded = loadJson(json)
       assert("int" === loaded.interface.rettype)
-      //TODO: find conversion from scala map to java map and vice versa
-      val map = new util.HashMap[String, String]()
-      map.put("a1", "int")
-      map.put("a2", "int")
-      assert(map === loaded.interface.args)
+      val map = Map("a1" -> "int", "a2" -> "int")
+      assert(map === loaded.interface.args.toMap)
     }
 
     it("shall load function body") {

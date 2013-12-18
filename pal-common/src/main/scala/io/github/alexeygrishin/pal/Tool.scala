@@ -3,7 +3,7 @@ package io.github.alexeygrishin.pal
 import com.github.mustachejava.DefaultMustacheFactory
 import java.io.{StringWriter, StringReader}
 import com.google.gson.Gson
-import io.github.alexeygrishin.pal.functions.{FunctionJson}
+import io.github.alexeygrishin.pal.functions.{FunctionImplementation, FunctionInterface, FunctionJson}
 import com.github.mustachejava.util.DecoratedCollection
 import scala.collection.JavaConversions
 
@@ -19,6 +19,8 @@ object Tool {
   }
 
   def readFunction(s: String) = new Gson().fromJson(s, classOf[FunctionJson])
+  def readFunctionInterface(s: String) = new FunctionInterface(readFunction(s))
+  def readFunctionImplementation(s: String) = new FunctionImplementation(readFunction(s))
 
   implicit def list2decorated[T](source: Iterable[T]): DecoratedCollection[T] = new DecoratedCollection[T](JavaConversions.asJavaCollection(source))
 }

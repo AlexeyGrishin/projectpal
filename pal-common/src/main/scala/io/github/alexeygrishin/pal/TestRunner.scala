@@ -1,6 +1,6 @@
 package io.github.alexeygrishin.pal
 
-import io.github.alexeygrishin.pal.codegen.{CodeGen}
+import io.github.alexeygrishin.pal.codegen.{CodeGenerator}
 import java.io.{InputStreamReader, FileReader}
 import com.google.gson.Gson
 import io.github.alexeygrishin.pal.functions.FunctionJson
@@ -18,8 +18,8 @@ object TestRunner {
     val predefined = new Gson().fromJson(new InputStreamReader(getClass.getResourceAsStream("/predefined.json")), functionsListJsonType.getType).asInstanceOf[FunctionsListJson].toList
     val storage = new InMemoryStorage(predefined)
 
-    val codeGen = new CodeGen(storage, langs.get)
-    println(codeGen.composeClass("capitalizeAll", "java"))
-    println(codeGen.composeClass("capitalizeAll", "ruby"))
+    val codeGen = new CodeGenerator(storage, langs.get)
+    println(codeGen.composeClass("joinLast", "java"))
+    //println(codeGen.composeClass("capitalizeAll", "ruby"))
   }
 }

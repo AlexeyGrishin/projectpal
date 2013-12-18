@@ -3,7 +3,7 @@ package io.github.alexeygrishin.pal
 import org.scalatest.FunSpec
 import io.github.alexeygrishin.pal.functions._
 import io.github.alexeygrishin.pal.codegen._
-import io.github.alexeygrishin.pal.codegen.lang.JavaLangHelper
+import io.github.alexeygrishin.pal.codegen.prepare.JavaLangHelper
 
 class ToolTest extends FunSpec {
 
