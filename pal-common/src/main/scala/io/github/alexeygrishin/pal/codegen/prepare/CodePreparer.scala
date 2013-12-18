@@ -10,9 +10,9 @@ class CodePreparer(val storage: FunctionsStorage) {
 
   val resolver = new DependencyResolver(storage)
 
-  def composeClass(funcName: String, langPreparer: LangPreparer) = {
-    val function = storage.get(funcName).getOrElse(throw new UnknownEntityException("function", funcName))
-    val allDependencies = resolver(function)
+  def composeClass(langPreparer: LangPreparer, funcNames: List[String]) = {
+    val functionsToInclude = storage.getAll(funcNames.toList)
+    val allDependencies = resolver(functionsToInclude)
     val allFunctions = allDependencies.registryFunctions
     val allBuiltinToInclude = allDependencies.builtinFunctions.filter((x) => langPreparer.getBuiltin(x.id).isInstanceOf[TemplatedBuiltin])
     new RenderableClass(
@@ -21,7 +21,7 @@ class CodePreparer(val storage: FunctionsStorage) {
     )
   }
 
-  def composeFunction(funcName: String, langPreparer: LangPreparer) = {
+  def composeFunction(langPreparer: LangPreparer, funcName: String) = {
     val function = storage.get(funcName).getOrElse(throw new UnknownEntityException("function", funcName))
     new RenderableClass(langPreparer.prepareFunction(function))
   }

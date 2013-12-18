@@ -1,8 +1,8 @@
 package io.github.alexeygrishin.pal.functions
 
 import org.scalatest.FunSpec
-import io.github.alexeygrishin.pal.Tool
 import scala.collection.JavaConversions._
+import io.github.alexeygrishin.pal.tools.Tool
 
 class FunctionImplementationJsonTest extends FunSpec {
 

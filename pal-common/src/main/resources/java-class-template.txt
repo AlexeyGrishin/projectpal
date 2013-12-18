@@ -13,7 +13,7 @@ class Pal {
 
     {{#functions}}
     /**
-     * :function {{name}}
+     * :function {{id}}
      * {{description}}
      *
      * @tags {{#tags}}{{value}}{{^last}}, {{/last}}{{/tags}}

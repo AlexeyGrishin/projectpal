@@ -19,7 +19,7 @@ object TestRunner {
     val storage = new InMemoryStorage(predefined)
 
     val codeGen = new CodeGenerator(storage, langs.get)
-    println(codeGen.composeClass("joinLast", "java"))
-    //println(codeGen.composeClass("capitalizeAll", "ruby"))
+    //println(codeGen.composeClass("java", "capitalizeAll", "joinLast"))
+    println(codeGen.composeClass("ruby", "capitalizeAll", "joinLast"))
   }
 }

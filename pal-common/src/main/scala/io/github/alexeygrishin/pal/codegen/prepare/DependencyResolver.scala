@@ -1,6 +1,6 @@
 package io.github.alexeygrishin.pal.codegen.prepare
 
-import io.github.alexeygrishin.pal.functions.{BuiltinFunctionDependency, RegistryFunctionDependency, FunctionInterface}
+import io.github.alexeygrishin.pal.functions.{FunctionImplementation, BuiltinFunctionDependency, RegistryFunctionDependency, FunctionInterface}
 import io.github.alexeygrishin.pal.storage.FunctionsStorage
 
 //TODO: test
@@ -10,6 +10,10 @@ class DependencyResolver(val storage: FunctionsStorage) {
 
   def apply(func: FunctionInterface): Dependencies = {
     resolveDependencies(new Dependencies(List.empty, List(storage.get(func.name).get)))
+  }
+
+  def apply(funcs: Iterable[FunctionImplementation]): Dependencies = {
+    resolveDependencies(new Dependencies(List.empty, funcs.toList))
   }
 
   private def resolveDependencies(dep: Dependencies): Dependencies = {

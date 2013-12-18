@@ -1,6 +1,7 @@
 package io.github.alexeygrishin.pal.storage
 
 import io.github.alexeygrishin.pal.functions._
+import io.github.alexeygrishin.pal.codegen.UnknownEntityException
 
 class InMemoryStorage(jsons: List[FunctionJson]) extends FunctionsStorage {
 
@@ -11,5 +12,5 @@ class InMemoryStorage(jsons: List[FunctionJson]) extends FunctionsStorage {
 
   def find(q: String): List[FunctionInterface] = functions.filter(f => f.name.startsWith(q) || f.tags.exists(_.startsWith(q)))
 
-  def getAll(names: List[String]): List[FunctionImplementation] = names.map(functionsQuickMap(_))
+  def getAll(names: List[String]): List[FunctionImplementation] = names.map(name => functionsQuickMap.get(name).getOrElse {throw new UnknownEntityException("function", name)})
 }

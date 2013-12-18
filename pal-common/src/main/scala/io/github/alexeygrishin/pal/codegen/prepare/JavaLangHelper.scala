@@ -23,6 +23,8 @@ class JavaLangHelper(private val helper: BuiltinHelper) extends DefaultLangHelpe
 
   override def getLangName: String = "java"
 
+  //TODO: --> json
+  //TODO: so we do not need these per-language helpers, just by language type - static/dynamic, sync/async
   protected def appendFunctionRef(builder: StringBuilder, ctx: ExpressionParsingContext, fr: FunctionRef) {
     builder.append(fr.name + "AsFunction")
   }

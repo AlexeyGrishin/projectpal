@@ -69,3 +69,4 @@ class Condition(val condition: Expression, val executeIfTrue: Expression) extend
   override def toString: String = "<If (" + condition.toString + ")>(" + executeIfTrue.toString + ")"
 }
 
+//TODO: unite functions, builtin functions and operators

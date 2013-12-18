@@ -10,14 +10,14 @@ class CodeGenerator(private val storage: FunctionsStorage, private val getLangCo
   private val preparer = new CodePreparer(storage)
   private val renderer = new CodeRenderer
 
-  def composeClass(funcName: String, langName: String) = {
+  def composeClass(langName: String, funcNames: String*) = {
     val langConfig = getLangConfig(langName).getOrElse(throw new UnknownEntityException("language", langName))
-    renderer.renderClass(preparer.composeClass(funcName, langConfig), langConfig)
+    renderer.renderClass(preparer.composeClass(langConfig, funcNames.toList), langConfig)
   }
 
-  def composeFunction(funcName: String, langName: String) = {
+  def composeFunction(langName: String, funcName: String) = {
     val langConfig = getLangConfig(langName).getOrElse(throw new UnknownEntityException("language", langName))
-    renderer.renderClass(preparer.composeFunction(funcName, langConfig), langConfig)
+    renderer.renderClass(preparer.composeFunction(langConfig, funcName), langConfig)
   }
 
 

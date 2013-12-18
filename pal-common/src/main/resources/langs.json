@@ -26,15 +26,21 @@
         generator:  "io.github.alexeygrishin.pal.codegen.prepare.RubySpecificPreparer",
         helper:     "io.github.alexeygrishin.pal.codegen.prepare.RubyLangHelper",
         builtin: {
-            "substring/2":      "$1.substring($2)",
-            "substring/3":      "$1.substring($2, $3)",
-            "uppercase/1":      "$1.toupper",
+            "substring/2":      "$1[$2..-1]",
+            "substring/3":      "$1[$2, $3]",
+            "uppercase/1":      "$1.upcase",
             "map/2":            "$1.map($2)",
             "split/2":          "$1.split($2)",
-            "join/2":           "$1.join($2)"
+            "join/2":           "$1.join($2)",
+            "listSize/1":       "$1.size",
+            "listFirst/1":      "$1.first",
+            "listLast/1":       "$1.last",
+            "listRest/1":       "$1[1..-1]",
+            "_if/2":            "return $2 if $1"
         },
         operators: {
-            "+":                "$1 + $2"
+            "+":                "$1 + $2",
+            "=":                "$1 == $2"
         }
     }
 }

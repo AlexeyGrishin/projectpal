@@ -5,9 +5,9 @@ import io.github.alexeygrishin.pal.storage.FunctionsStorage
 import org.mockito.Mockito._
 import org.mockito.Matchers._
 import io.github.alexeygrishin.pal.functions.{FunctionImplementation, Data, FunctionInterface}
-import io.github.alexeygrishin.pal.Tool
 import Data._
 import org.mockito.Matchers
+import io.github.alexeygrishin.pal.tools.Tool
 
 class DependencyResolverTest extends FunSpec {
 

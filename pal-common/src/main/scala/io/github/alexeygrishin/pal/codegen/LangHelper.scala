@@ -6,6 +6,7 @@ import io.github.alexeygrishin.pal.functions.expressions._
 trait LangHelper extends FunctionCompiler {
   def mapType(tp: AType): String = null
   def getLangName: String = null
+  def formatFunctionName(id: String): String = id
 }
 
 abstract class DefaultLangHelper(private val helper: BuiltinHelper) extends LangHelper {
@@ -64,7 +65,7 @@ abstract class DefaultLangHelper(private val helper: BuiltinHelper) extends Lang
   }
 
   protected def appendFunctionCallBegin(builder: StringBuilder, ctx: ExpressionParsingContext, fc: FunctionCall) {
-    builder.append(fc.name).append("(")
+    builder.append(formatFunctionName(fc.name)).append("(")
   }
 
   protected def appendOperator(builder: StringBuilder, ctx: ExpressionParsingContext, op: Operator, build: ( Expression) => Unit) {

@@ -6,13 +6,14 @@ import org.mockito.Mockito._
 import org.mockito.Matchers._
 import org.mockito.Matchers
 import io.github.alexeygrishin.pal.functions.expressions.{Expression, JsonToExpression}
-import io.github.alexeygrishin.pal.Tool
+import io.github.alexeygrishin.pal.tools.Tool
 
 class FunctionImplementationTest extends FunSpec  {
 
   def functionStub(implementations: String) = {
     val f = new FunctionJson()
     f.interface = new InterfaceJson()
+    f.interface.rettype = "string"
     f.implementation = new Gson().fromJson(implementations, classOf[java.util.HashMap[String, JsonElement]])
     f
   }
