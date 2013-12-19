@@ -24,6 +24,7 @@ class FunctionImplementation(json: FunctionJson) extends FunctionInterface(json)
   private def bind(translator: FunctionCompiler): ExpressionCompiler = new ExpressionCompiler {
     def compile(expressions: List[Expression]) = translator.translate(expressions, FunctionImplementation.this)
   }
+
 }
 
 

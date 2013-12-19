@@ -8,6 +8,7 @@ import io.github.alexeygrishin.pal.storage.InMemoryStorage
 import com.google.gson.reflect.TypeToken
 import scala.collection.JavaConversions._
 import io.github.alexeygrishin.pal.codegen.langconfig.LangConfigs
+import java.util.regex.Pattern
 
 object TestRunner {
 
@@ -21,5 +22,7 @@ object TestRunner {
     val codeGen = new CodeGenerator(storage, langs.get)
     //println(codeGen.composeClass("java", "capitalizeAll", "joinLast"))
     println(codeGen.composeClass("ruby", "capitalizeAll", "joinLast"))
+
+    println("aaaBbbbCccc".split("(?=[A-Z])").toList)
   }
 }

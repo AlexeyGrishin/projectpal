@@ -4,7 +4,7 @@ import scala.collection.JavaConversions._
 
 //TODO: test getArgumentName, equal/hashCode
 class FunctionInterface(json: FunctionJson) {
-  val name = json.name
+  def name = json.name
   val description = json.interface.description
   val tags = json.interface.tags
   val signature = new Signature(name, json.interface)
@@ -24,6 +24,9 @@ class FunctionInterface(json: FunctionJson) {
     val state = Seq(name)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
+
+  //for tests
+  def name_=(newName: String) {json.name = newName}
 }
 
 class Signature(val name: String, interf: InterfaceJson) {

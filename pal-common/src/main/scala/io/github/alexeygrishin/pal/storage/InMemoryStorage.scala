@@ -10,7 +10,10 @@ class InMemoryStorage(jsons: List[FunctionJson]) extends FunctionsStorage {
 
   def get(name: String): Option[FunctionImplementation] = functionsQuickMap.get(name)
 
-  def find(q: String): List[FunctionInterface] = functions.filter(f => f.name.startsWith(q) || f.tags.exists(_.startsWith(q)))
+  def find(q: String): List[FunctionInterface] =
+    (functions.filter(f => f.name == q).toSet ++
+      functions.filter(f => f.name.startsWith(q)) ++
+      functions.filter(f => f.tags.exists(_.startsWith(q)))).toList
 
   def getAll(names: List[String]): List[FunctionImplementation] = names.map(name => functionsQuickMap.get(name).getOrElse {throw new UnknownEntityException("function", name)})
 }
