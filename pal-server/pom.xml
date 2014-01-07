@@ -4,9 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.alexeygrishin</groupId>
     <artifactId>pal-server</artifactId>
-    <version>0.5</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>io.github.alexeygrishin</groupId>
+        <artifactId>pal</artifactId>
+        <version>0.5</version>
+    </parent>
 
     <dependencies>
         <dependency>
@@ -22,8 +27,46 @@
         <dependency>
             <groupId>io.github.alexeygrishin</groupId>
             <artifactId>pal-common</artifactId>
-            <version>0.4</version>
+            <version>0.5</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
-    <!-- TODO: how to add dependency to another pom -->
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>io.github.alexeygrishin.pal.server.RestServer</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

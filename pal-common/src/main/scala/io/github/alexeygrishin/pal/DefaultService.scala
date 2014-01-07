@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import io.github.alexeygrishin.pal.storage.{FakeStorage, InMemoryStorage}
 import scala.collection.JavaConversions._
 import io.github.alexeygrishin.pal.codegen.CodeGenerator
+import io.github.alexeygrishin.pal.api.{PalService, PalResponse, PalFunction}
 
 class DefaultService extends PalService {
   private val langs = new LangConfigs(new InputStreamReader(getClass.getResourceAsStream("/langs.json")))

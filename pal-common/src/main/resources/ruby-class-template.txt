@@ -26,6 +26,7 @@ module Pal
       lambda {|{{#signature.args}}{{name}}{{^last}}, {{/last}}{{/signature.args}}| {{name}}({{#signature.args}}{{name}}{{^last}}, {{/last}}{{/signature.args}}) }
     end
     {{/functions}}
+    #:addbefore
 
 {{^functiononly}}
 end

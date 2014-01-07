@@ -1,22 +1,20 @@
 <idea-plugin version="2">
-  <id>com.yourcompany.unique.plugin.id</id>
-  <name>Plugin display name here</name>
-  <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <id>io.github.alexeygrishin.pal</id>
+  <name>Pal</name>
+  <version>0.5</version>
+  <vendor email="alexey.grishin@gmail.com" url="http://github.com/AlexeyGrishin/projectpal">Alexey Grishin</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <small>most HTML tags may be used</small>
+      TBD
       ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <small>most HTML tags may be used</small>
+      TBD
       ]]>
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="107.105"/>
+  <idea-version since-build="123.72"/>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
@@ -25,25 +23,32 @@
   -->
 
   <application-components>
-    <!-- Add your application components here -->
       <component>
-          <implementation-class>TryA1</implementation-class>
+          <implementation-class>io.github.alexeygrishin.pal.ideaplugin.components.ApplicationComponent</implementation-class>
       </component>
   </application-components>
 
   <project-components>
-    <!-- Add your project components here -->
       <component>
-          <implementation-class>Try1</implementation-class>
+          <implementation-class>io.github.alexeygrishin.pal.ideaplugin.components.PalServiceComponent</implementation-class>
       </component>
   </project-components>
 
-  <actions>
-    <!-- Add your actions here -->
-  </actions>
+
+  <depends optional="true" config-file="java-specific.xml">com.intellij.modules.java</depends>
+  <depends optional="true" config-file="ruby-specific.xml">com.intellij.modules.ruby</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-      <completion.contributor language="JAVA" implementationClass="CPTest"/>
+       <completion.contributor id="paljava" language="JAVA" implementationClass="io.github.alexeygrishin.pal.ideaplugin.codecompletion.BaseCompletion" order="first, before magicCompletion"/>
+       <completion.contributor id="palruby" language="RUBY" implementationClass="io.github.alexeygrishin.pal.ideaplugin.codecompletion.BaseCompletion"/>
   </extensions>
+    <actions>
+        <action id="io.github.alexeygrishin.pal.ideaplugin.ui.LookupAction"
+                class="io.github.alexeygrishin.pal.ideaplugin.ui.LookupAction" text="Lookup for Pal function ..." >
+            <add-to-group group-id="EditMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift P"/>
+
+        </action>
+    </actions>
 </idea-plugin>

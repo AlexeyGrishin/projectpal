@@ -1,0 +1,23 @@
+<component name="libraryTable">
+  <library name="org.apache.cxf:cxf-rt-rs-client:3.0.0-milestone1" type="repository">
+    <properties maven-id="org.apache.cxf:cxf-rt-rs-client:3.0.0-milestone1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/cxf-rt-rs-client-3.0.0-milestone1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.osgi.core-4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/cxf-rt-transports-http-3.0.0-milestone1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/cxf-core-3.0.0-milestone1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/woodstox-core-asl-4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/stax2-api-3.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xmlschema-core-2.0.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/cxf-rt-frontend-jaxrs-3.0.0-milestone1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.ws.rs-api-2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.annotation-api-1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/cxf-rt-rs-client-3.0.0-milestone1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/cxf-rt-rs-client-3.0.0-milestone1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

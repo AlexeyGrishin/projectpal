@@ -8,12 +8,11 @@ import java.util.*;
 import {{value}}
 {{/imports}}
 
-class Pal {
+public class Pal {
 {{/functiononly}}
 
     {{#functions}}
-    /**
-     * :function {{id}}
+    /** :function {{id}}
      * {{description}}
      *
      * @tags {{#tags}}{{value}}{{^last}}, {{/last}}{{/tags}}
@@ -80,6 +79,7 @@ class Pal {
     }
 
     {{/builtin.listRest/1}}
+    //:addbefore
     //:permanent
     public static interface Func1<A1, R> {
         R act(A1 arg1);

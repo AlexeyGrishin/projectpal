@@ -1,4 +1,4 @@
-package io.github.alexeygrishin.pal;
+package io.github.alexeygrishin.pal.api;
 
 import java.util.List;
 
