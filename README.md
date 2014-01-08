@@ -27,8 +27,9 @@ Project status
 ================
 For now there is a working prototype - server with 3 predefined functions which can build java and ruby code and plugin for Jetbrains IDEA/Rubymine which allows to insert pal functions into your code.
 
-For more information see this wiki page.
+To try it - see [this instruction](https://github.com/AlexeyGrishin/projectpal/wiki/How-to-work-with-prototype)
 
+In order to build it on your workstation - just clone the github repository and open in Jetbrains IDEA (Community edition is enough). Without IDEA you may build server using maven, but not the plugin.
 
 TODO list
 ================
