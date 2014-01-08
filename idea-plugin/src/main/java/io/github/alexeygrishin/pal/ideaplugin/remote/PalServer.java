@@ -8,6 +8,9 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents pal server
+ */
 public class PalServer extends Listenable<PalServerListener> {
     private static PalServer ourInstance = new PalServer();
     private final PalApi api;
@@ -26,11 +29,11 @@ public class PalServer extends Listenable<PalServerListener> {
     }
 
     public List<PalFunction> search(String language, String q) {
-        return api.search(q, "slow").getValue();
+        return api.search(q).getValue();
     }
 
     public List<PalFunction> getPopular(String language) {
-        return api.search("", "slow").getValue();
+        return api.search("").getValue();
     }
 
     public String getFunction(String id, String language) {
@@ -38,12 +41,21 @@ public class PalServer extends Listenable<PalServerListener> {
     }
 
 
-    public void ping() {
-        api.getLanguages();
+    private void ping() {
+        try {
+            api.getLanguages();
+        }
+        catch (Throwable e) {
+            //ignore
+        }
     }
 
     @Override
     protected void justAfterListenerAdded(PalServerListener listener) {
         state.fireIfFailed(listener);
+    }
+
+    public boolean isAvailable() {
+        return state.isAvailable();
     }
 }

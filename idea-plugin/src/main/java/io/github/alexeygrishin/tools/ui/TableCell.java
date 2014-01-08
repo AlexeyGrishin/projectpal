@@ -12,9 +12,4 @@ public @interface TableCell {
     public String name();
     public int width() default -1;
 
-    /* TODO: causes compilation error sometimes, need to find another place for them
-    public static Class<TableCellRenderer> NO_RENDERER = TableCellRenderer.class;
-    public static Class<TableCellEditor> NO_EDITOR = TableCellEditor.class;
-    */
-
 }

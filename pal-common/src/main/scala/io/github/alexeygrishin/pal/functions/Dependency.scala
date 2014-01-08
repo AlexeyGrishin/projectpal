@@ -1,5 +1,8 @@
 package io.github.alexeygrishin.pal.functions
 
+/**
+ * Represents dependency of pal function to other entity - pal function, builting function, operator
+ */
 sealed abstract case class Dependency() {
   def onlyIf[T](cls: Class[T]): List[T] = cls.isInstance(this) match {
     case true => List(this.asInstanceOf[T])

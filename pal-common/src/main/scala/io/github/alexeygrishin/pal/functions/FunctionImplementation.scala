@@ -9,6 +9,9 @@ trait ExpressionCompiler {
 }
 
 //TODO: test getDependencies
+/**
+ * Represents Pal function with its implementation. Allows to get function body as string
+ */
 class FunctionImplementation(json: FunctionJson) extends FunctionInterface(json) {
   private val languages = json.implementation.map ((pair) => pair._1 -> (pair._2.get(0) match {
     case p: java.lang.String => new RegularLanguageImplementation(pair._1, pair._2.toList.asInstanceOf[List[String]])

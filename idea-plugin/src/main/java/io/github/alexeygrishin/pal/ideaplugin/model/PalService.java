@@ -3,17 +3,16 @@ package io.github.alexeygrishin.pal.ideaplugin.model;
 import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import io.github.alexeygrishin.pal.api.PalFunction;
 import io.github.alexeygrishin.pal.ideaplugin.model.file.IdeaFile;
 import io.github.alexeygrishin.pal.ideaplugin.model.lang.FunctionCallString;
-import io.github.alexeygrishin.pal.ideaplugin.model.lang.LangAndPlatform;
+import io.github.alexeygrishin.pal.ideaplugin.model.lang.LangAndPlatformEx;
 import io.github.alexeygrishin.pal.ideaplugin.model.lang.ProjectBasedLanguage;
 import io.github.alexeygrishin.pal.ideaplugin.remote.PalServer;
 import io.github.alexeygrishin.pal.ideaplugin.remote.PalServerListener;
+import io.github.alexeygrishin.pal.ideaplugin.ui.Notifier;
 import io.github.alexeygrishin.tools.Listenable;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,10 +20,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Facade for most of required functionality to be used by UI components.
+ * Could be obtained from project, like this:
+ * <code>
+ *     PalService.getInstance(project);
+ * </code>
+ *
+ * Also there are several static methods that could be used from any context
+ */
 public class PalService extends Listenable<PalServiceListener> {
     private PalClass palClass;
     private PalServer server;
-    private List<LangAndPlatform> langsAndPlatforms = new LinkedList<LangAndPlatform>();
+    private List<LangAndPlatformEx> langsAndPlatforms = new LinkedList<LangAndPlatformEx>();
+    private static List<PalClassListener> listenersForPalClasses = new LinkedList<PalClassListener>();
     private Project project;
 
     public PalService(Project project) {
@@ -33,54 +42,64 @@ public class PalService extends Listenable<PalServiceListener> {
         server = PalServer.getInstance();
     }
 
-    public PalClass getPalClass() {
-        return palClass;
+    public static Key<PalService> PAL_SERVICE = Key.create("pal.service");
+
+    public static PalService getInstance(Project project) {
+        return project.getUserData(PAL_SERVICE);
     }
 
-    public PalClass getPalClass(Language language) throws LanguageNotSupportedByPal {
+
+    /**
+     * Helper method in order to enable/disable actions
+     * @param event action event
+     * @return true if language related to this event is supported by pal
+     */
+    public static boolean isLanguageSupported(AnActionEvent event) {
+        return PalService.getInstance(event.getProject()).isLanguageSupported(event.getData(LangDataKeys.LANGUAGE));
+    }
+
+    /**
+     *
+     * @return true if server available (warn: it just returns latest known state and does not perform any real call)
+     */
+    public static boolean isServerAvailable() {
+        return PalServer.getInstance().isAvailable();
+    }
+
+    public static void addServerListener(PalServerListener serverListener) {
+        PalServer.getInstance().addListener(serverListener);
+    }
+
+    /**
+     * Returns pal class related to the provided language.
+     * TODO: right now returns only one instance
+     * @param language
+     * @return pal class
+     * @throws LanguageNotSupportedByPal if language is null or not supported
+     */
+    public PalClass getPalClass(@Nullable Language language) throws LanguageNotSupportedByPal {
         //TODO: map for pal classes per language
         if (palClass == null) {
-            LangAndPlatform lang = getLangAndPlatform(language);
-            palClass = new PalClass(server, new IdeaFile(lang.getFileLocator()));
+            LangAndPlatformEx lang = getLangAndPlatform(language);
+            palClass = new PalClass(server, new IdeaFile(lang.getFileLocator()), lang);
+            palClass.addListeners(listenersForPalClasses);
             palClass.update();
         }
         return palClass;
     }
 
+    /**
+     * Returns live functions list which could be updated/filter from server
+     * @param language
+     * @return
+     * @throws LanguageNotSupportedByPal
+     */
     public PalFunctions createSnapshot(Language language) throws LanguageNotSupportedByPal {
-        return new PalServerFunctionsAbsentLocally(new PalServerFunctions(server, getLangAndPlatform(language).getPalLanguage()), getPalClass(language));
+        return new PalServerFunctions(server, getLangAndPlatform(language).getPalLanguage());
     }
 
-    public static Key<PalService> PAL_SERVICE = Key.create("pal.service");
-    public static PalService getInstance(Project project) {
-        return project.getUserData(PAL_SERVICE);
-    }
-
-    public void addServerListener(PalServerListener serverListener) {
-        server.addListener(serverListener);
-    }
-
-    public void ping() {
-        server.ping();
-    }
-
-    private LangAndPlatform getLangAndPlatform(Language language) throws LanguageNotSupportedByPal {
-        LangAndPlatform lap = findLangAndPlatform(language);
-        if (lap == null) throw new LanguageNotSupportedByPal();
-        return lap;
-    }
-
-    private LangAndPlatform findLangAndPlatform(Language language)  {
-        if (language == null) return null;
-        for (LangAndPlatform lap: langsAndPlatforms) {
-            if (lap.matches(language)) {
-                return lap;
-            }
-        }
-        return null;
-    }
-
-    public void registerLangAndPlatform(Class<? extends LangAndPlatform> lapClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    //for internal usage
+    public void registerLangAndPlatform(Class<? extends LangAndPlatformEx> lapClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         if (ProjectBasedLanguage.class.isAssignableFrom(lapClass)) {
             langsAndPlatforms.add(lapClass.getConstructor(Project.class).newInstance(project));
         }
@@ -89,16 +108,30 @@ public class PalService extends Listenable<PalServiceListener> {
         }
     }
 
-    public static boolean isLanguageSupported(AnActionEvent event) {
-        return PalService.getInstance(event.getProject()).isLanguageSupported(event.getData(LangDataKeys.LANGUAGE));
+
+    private LangAndPlatformEx getLangAndPlatform(Language language) throws LanguageNotSupportedByPal {
+        LangAndPlatformEx lap = findLangAndPlatform(language);
+        if (lap == null) throw new LanguageNotSupportedByPal();
+        return lap;
     }
+
+    private LangAndPlatformEx findLangAndPlatform(Language language)  {
+        if (language == null) return null;
+        for (LangAndPlatformEx lap: langsAndPlatforms) {
+            if (lap.matches(language)) {
+                return lap;
+            }
+        }
+        return null;
+    }
+
 
     private boolean isLanguageSupported(@Nullable Language language) {
         return findLangAndPlatform(language) != null;
     }
 
-    //TODO: probably it is better to have it in PalClass which already knows about language and all fucntions...
-    public FunctionCallString getFunctionCallString(Language language, PalFunction function) {
-        return getLangAndPlatform(language).getFunctionCallString(function.getId());
+    //for internal usage
+    public static void addPalClassesListener(PalClassListener palClassListener) {
+        listenersForPalClasses.add(palClassListener);
     }
 }

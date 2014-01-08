@@ -2,15 +2,15 @@ package io.github.alexeygrishin.pal.functions
 
 import io.github.alexeygrishin.pal.tools.Tokenizer
 
+/**
+ * Represents Pal type (simple or complex, like collection or map of other types)
+ */
 abstract case class AType()
 
 case class ASimpleType(name: String) extends AType
 case class AComplexType(name: String, internal: Iterable[AType]) extends AType {
   def this(name: String, internal: AType*) = this(name, internal)
 }
-
-
-
 
 object AType {
   def apply(expr: String) = {

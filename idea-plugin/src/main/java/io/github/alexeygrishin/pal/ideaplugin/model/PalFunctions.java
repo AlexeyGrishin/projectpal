@@ -5,9 +5,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public interface PalFunctions extends FunctionsContainer {
+/**
+ * Pal functions collection that could be filtered
+ */
+public interface PalFunctions {
+    /**
+     * Performs filtering of the collection
+     * @param newFilter filter to apply to the collection
+     * @return new collection
+     */
     Collection<PalFunction> update(@NotNull String newFilter);
 
-    @Override
+    /**
+     *
+     * @return current collection state
+     */
     Collection<PalFunction> getFunctions();
 }

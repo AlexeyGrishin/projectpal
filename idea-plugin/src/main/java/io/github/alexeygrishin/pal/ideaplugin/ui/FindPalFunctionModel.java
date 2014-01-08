@@ -10,6 +10,7 @@ import com.intellij.util.Processor;
 import io.github.alexeygrishin.pal.api.PalFunction;
 import io.github.alexeygrishin.pal.ideaplugin.model.PalFunctions;
 import io.github.alexeygrishin.pal.ideaplugin.model.PalService;
+import io.github.alexeygrishin.pal.ideaplugin.remote.PalServerError;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,13 +34,7 @@ public class FindPalFunctionModel extends SimpleChooseByNameModel implements Cho
 
     @Override
     public ListCellRenderer getListCellRenderer() {
-        //TODO: show description as well
-        return new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return super.getListCellRendererComponent(list, PalFunction.toString(value), index, isSelected, cellHasFocus);
-            }
-        };
+        return new PalFunctionCellRenderer();
     }
 
     @Nullable
@@ -70,13 +65,19 @@ public class FindPalFunctionModel extends SimpleChooseByNameModel implements Cho
 
     @Override
     public boolean filterElements(@NotNull ChooseByNameBase base, @NotNull String pattern, boolean everywhere, @NotNull ProgressIndicator cancelled, @NotNull Processor<Object> consumer) {
-        snapshot.update(pattern);
-        cancelled.checkCanceled();
-        for (PalFunction function: snapshot.getFunctions()) {
-            consumer.process(function);
+        try {
+            snapshot.update(pattern);
+            cancelled.checkCanceled();
+            for (PalFunction function: snapshot.getFunctions()) {
+                consumer.process(function);
+            }
+            //return value always ignored, and there is no comment, so I'm not sure when to return true
+            return false;
         }
-        //return value always ignored, and there is no comment, so I'm not sure when to return true
-        return false;
+        catch (PalServerError e) {
+            //nothing special
+            return false;
+        }
     }
 
 

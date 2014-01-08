@@ -1,14 +1,14 @@
 package io.github.alexeygrishin.pal.ideaplugin.model.file;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import pal.Pal;
+import com.intellij.psi.PsiManager;
+import io.github.alexeygrishin.tools.threads.AnyThread;
+import io.github.alexeygrishin.tools.threads.InThread;
+import io.github.alexeygrishin.tools.threads.UIThread;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +19,7 @@ public class IdeaFile implements PhysicalFile {
 
     public IdeaFile(PsiFileLocator locator) {
         this.locator = locator;
+
     }
 
     @Override
@@ -28,13 +29,20 @@ public class IdeaFile implements PhysicalFile {
 
 
     @Override
-    public void setContent(final String content) {
-        withDocument(new DocAction() {
+    public void setContent(@NotNull final String content) {
+        ensurePsiFileExists();
+        InThread.execute(new Runnable() {
             @Override
-            public void run(Document doc) {
-                doc.setText(content);
+            @UIThread(write = true)
+            public void run() {
+                getDocument().setText(content);
+
             }
         });
+    }
+
+    private void ensurePsiFileExists() {
+        locator.createSync();
     }
 
     private Document getDocument() {
@@ -42,36 +50,23 @@ public class IdeaFile implements PhysicalFile {
     }
 
     private PsiFile getPsiFile() {
-        return locator.createOrGet();
-    }
-
-    private void withDocument(final DocAction action) {
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        action.run(getDocument());
-                    }
-                });
-
-            }
-        }, ModalityState.defaultModalityState());
+        return locator.get();
     }
 
     @Override
-    public void insertBefore(String marker, final String content) {
+    public void insertBefore(@NotNull String marker, @NotNull final String content) {
+        ensurePsiFileExists();
         final Pattern makerRegex = Pattern.compile("^(.*" + marker + ".*)$", Pattern.MULTILINE);
-        withDocument(new DocAction() {
+        InThread.execute(new Runnable() {
             @Override
-            public void run(Document doc) {
+            @UIThread(write = true)
+            public void run() {
+                Document doc = getDocument();
                 Matcher m = makerRegex.matcher(doc.getCharsSequence());
                 if (m.find()) {
                     int insertHere = m.start() - 1;
                     doc.insertString(insertHere, content);
-                }
-                else {
+                } else {
                     //TODO: recover somehow - probably reload the whole class
                     throw new IllegalStateException("Cannot find ':addbefore' marker in pal class - do not know where to insert :(");
                 }
@@ -79,27 +74,23 @@ public class IdeaFile implements PhysicalFile {
         });
     }
 
+    @NotNull
     @Override
     public String getContent() {
-        return ApplicationManager.getApplication().runReadAction(new Computable<String>() {
+        ensurePsiFileExists();
+        return InThread.executeAndReturn(new Computable<String>() {
             @Override
+            @AnyThread(read = true)
             public String compute() {
                 return getDocument().getText();
             }
         });
     }
 
+    @NotNull
     @Override
-    public String getLanguage() {
-        return locator.getLanguage();    //TODO: there shall be valid mapping between idea language names and Pal language names
+    public String getPathAsString() {
+        return locator.getPathAsString();
     }
 
-    @Override
-    public String getClassNameToReference() {
-        return locator.getClassNameToReference();
-    }
-
-    private static interface DocAction {
-        public void run(Document doc);
-    }
 }

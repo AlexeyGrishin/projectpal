@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MultiListener<T> implements InvocationHandler{
+class MultiListener<T> implements InvocationHandler{
 
     private final List<T> listeners = Collections.synchronizedList(new LinkedList<T>());
 

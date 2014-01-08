@@ -1,5 +1,16 @@
 package io.github.alexeygrishin.tools;
 
+import io.github.alexeygrishin.pal.ideaplugin.model.PalClassListener;
+
+import java.util.List;
+
+/**
+ * Base class like "Observable" for generic-based listeners.
+ * Subclasses:
+ *  - shall call {@link #initListeners(Class)} in constructor
+ *  - may call {@link #listeners()} to get access to all listeners via single instance
+ * @param <T>
+ */
 public class Listenable<T> {
 
     private ListenerContainer<T> container = null;
@@ -36,5 +47,11 @@ public class Listenable<T> {
     protected final T listeners() {
         checkInitialized();
         return listeners;
+    }
+
+    public void addListeners(Iterable<T> listeners) {
+        checkInitialized();
+        for (T listener: listeners)
+            addListener(listener);
     }
 }

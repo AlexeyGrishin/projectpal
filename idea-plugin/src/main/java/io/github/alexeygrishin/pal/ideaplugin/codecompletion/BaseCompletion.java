@@ -12,15 +12,27 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.Consumer;
 import com.intellij.util.ProcessingContext;
 import io.github.alexeygrishin.pal.api.PalFunction;
-import io.github.alexeygrishin.pal.ideaplugin.model.*;
+import io.github.alexeygrishin.pal.ideaplugin.model.LanguageNotSupportedByPal;
+import io.github.alexeygrishin.pal.ideaplugin.model.PalFunctions;
+import io.github.alexeygrishin.pal.ideaplugin.model.PalService;
+import io.github.alexeygrishin.pal.ideaplugin.model.UserFileManipulator;
 import io.github.alexeygrishin.pal.ideaplugin.model.lang.FunctionCallString;
+import io.github.alexeygrishin.pal.ideaplugin.remote.PalServerError;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.regex.Pattern;
+
+/**
+ * Base class for all code completions. Every new language may use the same class or create a subclass.
+ * This code completion is called after user typed something like 'pal.'. Methods from Pal server
+ * shall be added after already existent Pal class methods.
+ */
 public class BaseCompletion extends CompletionContributor {
 
     //CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED is not defined for RubyMine
-    private final static String DUMMY = "intellijIdeaRulezzz";
+    //... and in RubyMine it is started from capital I...
+    private final static Pattern DUMMY = Pattern.compile("intellijIdeaRulezzz",Pattern.CASE_INSENSITIVE);
 
     public BaseCompletion() {
         this(true);
@@ -51,7 +63,7 @@ public class BaseCompletion extends CompletionContributor {
     }
 
     private String getLookupString(PsiElement position) {
-        return position.getText().replaceAll(DUMMY, "").trim();
+        return DUMMY.matcher(position.getText()).replaceAll("").trim();
     }
 
     public static PsiElement getPalBeforeDot(PsiElement element) {
@@ -60,12 +72,16 @@ public class BaseCompletion extends CompletionContributor {
         return findBefore(dot, "pal", 2);
     }
 
+
     @Nullable
     public static PsiElement findBefore(PsiElement element, String text, int howFar) {
         PsiElement target = element;
         while (howFar --> 0 && target != null && !target.getText().equalsIgnoreCase(text)) {
-
-            target = target.getPrevSibling();
+            PsiElement next = target.getPrevSibling();
+            if (next == null && target.getParent() != null) {
+                next = target.getParent().getPrevSibling();
+            }
+            target = next;
         }
         if (target == null || !target.getText().equalsIgnoreCase(text)) return null;
         return target;
@@ -81,16 +97,9 @@ public class BaseCompletion extends CompletionContributor {
             }
         } catch (LanguageNotSupportedByPal languageNotSupportedByPal) {
             result.addLookupAdvertisement("The language '" + language + "' is not supported by Pal yet");
+        } catch (PalServerError connectionError) {
+            //just do nothing
         }
-    }
-
-    @Override
-    public void fillCompletionVariants(CompletionParameters parameters, CompletionResultSet result) {
-        super.fillCompletionVariants(parameters, result);
-    }
-
-    public String getPalClassName(Project project, Language language) {
-        return PalService.getInstance(project).getPalClass(language).getClassName();
     }
 
     private class PalFunctionLookupElement extends LookupElement {
@@ -117,25 +126,10 @@ public class BaseCompletion extends CompletionContributor {
 
         @Override
         public void handleInsert(final InsertionContext context) {
-            insertFunction(function, context.getProject());
-            ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                @Override
-                public void run() {
-                FunctionCallString str = PalService.getInstance(context.getProject()).getFunctionCallString(context.getFile().getLanguage(), function);
-                context.getDocument().replaceString(pal.getTextOffset(), context.getTailOffset(), str.functionCall);
-                context.getEditor().getCaretModel().moveToOffset(context.getTailOffset() + str.caretOffsetFromEnd);
-                }
-            });
-
+            UserFileManipulator userFile = UserFileManipulator.getInstance(context.getProject());
+            userFile.insertPalFunctionCall(context.getEditor(),                    PalService.getInstance(context.getProject()).getPalClass(context.getFile().getLanguage()),
+                    function, pal.getTextOffset(), context.getTailOffset());
         }
     }
 
-    private void insertFunction(final PalFunction palFunction, final Project project) {
-        ProgressManager.getInstance().executeNonCancelableSection(new Runnable() {
-            @Override
-            public void run() {
-                PalService.getInstance(project).getPalClass().addFunction(palFunction);
-            }
-        });
-    }
 }

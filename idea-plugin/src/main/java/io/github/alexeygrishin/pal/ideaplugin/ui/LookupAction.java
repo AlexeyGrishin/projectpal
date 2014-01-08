@@ -2,22 +2,21 @@ package io.github.alexeygrishin.pal.ideaplugin.ui;
 
 
 import com.intellij.ide.actions.GotoActionBase;
-
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
-
 import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.Processor;
 import io.github.alexeygrishin.pal.api.PalFunction;
 import io.github.alexeygrishin.pal.ideaplugin.model.PalService;
+import io.github.alexeygrishin.pal.ideaplugin.model.UserFileManipulator;
 import io.github.alexeygrishin.pal.ideaplugin.model.lang.FunctionCallString;
+import io.github.alexeygrishin.pal.ideaplugin.remote.PalServerListener;
 
 public class LookupAction extends GotoActionBase {
+
 
     @Override
     protected void gotoActionPerformed(final AnActionEvent e) {
@@ -30,17 +29,8 @@ public class LookupAction extends GotoActionBase {
             public void elementChosen(ChooseByNamePopup popup, final Object element) {
                 final PalFunction function = (PalFunction) element;
                 final PalService service = PalService.getInstance(project);
-                service.getPalClass(language).addFunction(function);
-                ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        FunctionCallString str = service.getFunctionCallString(language, function);
-                        int caret = editor.getCaretModel().getOffset();
-                        editor.getDocument().insertString(caret, str.functionCall);
-                        editor.getCaretModel().moveToOffset(caret + str.functionCall.length() + str.caretOffsetFromEnd);
-                    }
-                });
-                //Notifications.Bus.notify(new Notification("pal_group", "Pal class created", "Pal class created!", NotificationType.INFORMATION));
+                final UserFileManipulator userFile = UserFileManipulator.getInstance(project);
+                userFile.insertPalFunctionCallAtCaret(editor, service.getPalClass(language), function);
             }
         }, null, ChooseByNamePopup.createPopup(project, model, model));
 
@@ -52,9 +42,15 @@ public class LookupAction extends GotoActionBase {
         if (!isSupported) {
             event.getPresentation().setEnabledAndVisible(false);
         }
-        else {
+        else if (!PalService.isServerAvailable()) {
+            event.getPresentation().setVisible(true);
+            event.getPresentation().setEnabled(false);
+            event.getPresentation().setDescription("**DISABLED** - please run do not forget to run pal server");
+        } else {
             event.getPresentation().setEnabledAndVisible(true);
             super.update(event);
         }
     }
+
+
 }

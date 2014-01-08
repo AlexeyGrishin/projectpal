@@ -12,7 +12,7 @@ public interface PalServerListener {
     void onConnectionEnd();
 
     /**
-     * Called when call to server failed
+     * Called when call to server failed. Is called once before {@link #onConnectionRestore()} is called.
      * @param error error message
      */
     void onConnectionFail(String error);

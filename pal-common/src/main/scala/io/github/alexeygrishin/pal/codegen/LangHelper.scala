@@ -3,17 +3,32 @@ package io.github.alexeygrishin.pal.codegen
 import io.github.alexeygrishin.pal.functions._
 import io.github.alexeygrishin.pal.functions.expressions._
 
+/**
+ * Provides language-specific information
+ */
 trait LangHelper extends FunctionCompiler {
+  /**
+   * Maps Pal type to the language-specific type
+   */
   def mapType(tp: AType): String = null
+
+  /**
+   *
+   * @return language name
+   */
   def getLangName: String = null
+
+  /**
+   * Formats function name according to language standards (camelCase, under_score, etc.)
+   */
   def formatFunctionName(id: String): String = id
 }
 
 abstract class DefaultLangHelper(private val helper: BuiltinHelper) extends LangHelper {
 
-  type ExpressionParsingContext = FunctionImplementation
+  type ExpressionParsingContext = FunctionInterface
 
-  override def translate(expressions: List[Expression], function: FunctionImplementation): List[String] = {
+  override def translate(expressions: List[Expression], function: FunctionInterface): List[String] = {
     val ctx = function
     expressions.map(toString(ctx, _))
   }

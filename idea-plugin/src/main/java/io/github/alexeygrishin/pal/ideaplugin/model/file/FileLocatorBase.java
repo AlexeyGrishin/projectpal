@@ -4,16 +4,19 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.*;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.file.PsiDirectoryFactory;
+import io.github.alexeygrishin.tools.threads.InThread;
+import io.github.alexeygrishin.tools.threads.Sync;
+import io.github.alexeygrishin.tools.threads.UIThread;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+
 
 public abstract class FileLocatorBase implements PsiFileLocator {
     protected Project project;
@@ -24,6 +27,15 @@ public abstract class FileLocatorBase implements PsiFileLocator {
         this.project = project;
         psiManager = PsiManager.getInstance(project);
         palFile = getExistentPalFile(project);
+        VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileAdapter() {
+            @Override
+            public void contentsChanged(VirtualFileEvent event) {
+                if (event.getFile().equals(palFile)) {
+                    //TODO: notify listeners about it
+                    System.out.println("File changed!");
+                }
+            }
+        });
     }
 
     private VirtualFile getPalFile() {
@@ -58,37 +70,38 @@ public abstract class FileLocatorBase implements PsiFileLocator {
         return palFile == null ? null : psiManager.findFile(palFile);
     }
 
+    @Override
+    public final void createSync() {
+        VirtualFile palFile = getPalFile();
+        if (palFile != null) {
+            return;
+        }
+        InThread.execute(new Runnable() {
+            @Override
+            @UIThread(write = true)
+            @Sync
+            public void run() {
+                VirtualFile[] sourceRoots = getRootsForSource(project);
+                if (sourceRoots.length == 0)
+                    throw new IllegalStateException("Cannot create Pal file in the project - there is no source root");
+                VirtualFile root = sourceRoots[0];
+                try {
+                    VirtualFile palDirectory = VfsUtil.createDirectoryIfMissing(root, getDefaultFileLocation());
+                    PsiDirectory dir = PsiDirectoryFactory.getInstance(project).createDirectory(palDirectory);
+                    PsiFile palPsiFile = dir.createFile(getFileName());
+                    FileLocatorBase.this.palFile = palPsiFile.getVirtualFile();
+
+                } catch (IOException e) {
+                    throw new IllegalStateException("Cannot create directory for Pal class", e);
+                }
+            }
+        });
+    }
+
     @NotNull
     @Override
-    public final PsiFile createOrGet() {
-        //TODO: ugly
-        VirtualFile palFile = getPalFile();
-        if (palFile == null) {
-            ApplicationManager.getApplication().invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            VirtualFile[] sourceRoots = getRootsForSource(project);
-                            if (sourceRoots.length == 0)
-                                throw new IllegalStateException("Cannot create Pal file in the project - there is no source root");
-                            VirtualFile root = sourceRoots[0];
-                            try {
-                                VirtualFile palDirectory = VfsUtil.createDirectoryIfMissing(root, getDefaultFileLocation());
-                                PsiDirectory dir = PsiDirectoryFactory.getInstance(project).createDirectory(palDirectory);
-                                PsiFile palPsiFile = dir.createFile(getFileName());
-                                FileLocatorBase.this.palFile = palPsiFile.getVirtualFile();
-
-                            } catch (IOException e) {
-                                throw new IllegalStateException("Cannot create directory for Pal class", e);
-                            }
-                        }
-                    });
-                }
-            }, ModalityState.defaultModalityState());
-        }
-        return get();
+    public String getPathAsString() {
+        return getDefaultFileLocation() + getFileName();
     }
 
 

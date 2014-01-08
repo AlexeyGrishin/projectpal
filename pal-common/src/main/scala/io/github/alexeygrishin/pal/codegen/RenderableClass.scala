@@ -8,6 +8,9 @@ import Tool._
 
 
 //TODO: test constructors, check collections are java ones, not scala
+/**
+ * Class ready for rendering with Mustache (so all Scala types are converted to Java ones).
+ */
 class RenderableClass(functionsList: List[RenderableFunction], val functiononly: Boolean = false, builtinsToInclude: List[String] = List.empty) {
   def this(function: RenderableFunction) = this(List(function), true)
   def this(functionsList: List[RenderableFunction], builtinsToInclude: List[String]) = this(functionsList, false, builtinsToInclude)

@@ -3,6 +3,9 @@ package io.github.alexeygrishin.pal.functions
 import scala.collection.JavaConversions._
 
 //TODO: test getArgumentName, equal/hashCode
+/**
+ * Represents Pal function interface without body. USed to get brief information about function
+ */
 class FunctionInterface(json: FunctionJson) {
   def name = json.name
   val description = json.interface.description

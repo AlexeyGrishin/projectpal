@@ -1,7 +1,7 @@
 package io.github.alexeygrishin.pal.ideaplugin.remote;
 
 
-public class PalServerState implements PalServerListener {
+class PalServerState implements PalServerListener {
     private boolean failed = false;
     private String reason = "";
     private final Object lock = new Object();
@@ -41,5 +41,9 @@ public class PalServerState implements PalServerListener {
         if (wasFailed) {
             listener.onConnectionFail(wasReason);
         }
+    }
+
+    public boolean isAvailable() {
+        return !failed;
     }
 }

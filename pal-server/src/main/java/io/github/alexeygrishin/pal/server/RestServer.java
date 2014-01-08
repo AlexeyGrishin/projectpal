@@ -7,7 +7,6 @@ import spark.*;
 
 public class RestServer {
 
-    //TODO: it would be better to re-implement it with Jercey - it will look simpler
     public static void main(String args[]) {
         final PalService service = new DefaultService();
         get(new JsonRoute("/languages") {

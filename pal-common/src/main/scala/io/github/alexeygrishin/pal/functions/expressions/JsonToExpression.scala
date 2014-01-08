@@ -3,7 +3,7 @@ package io.github.alexeygrishin.pal.functions.expressions
 import scala.collection.JavaConversions._
 
 object JsonToExpression {
-  val isOperator = "[-+/*<>=]".r     //TODO: not only those 4 are operators
+  val isOperator = "[-+/*<>=]".r     //TODO: not only those 7 are operators
   val isRef = "_ref".r
   val isBuiltinFunction = "@[_a-zA-Z0-9]+".r
 

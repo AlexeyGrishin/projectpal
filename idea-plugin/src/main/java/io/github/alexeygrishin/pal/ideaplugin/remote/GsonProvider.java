@@ -1,15 +1,7 @@
 //https://gist.github.com/hstaudacher/4967804
 package io.github.alexeygrishin.pal.ideaplugin.remote;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import com.google.gson.Gson;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -19,8 +11,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
-import com.google.gson.Gson;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 
 @Provider

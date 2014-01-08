@@ -6,6 +6,10 @@ import io.github.alexeygrishin.pal.functions.{BuiltinFunctionDependency, Registr
 import io.github.alexeygrishin.pal.codegen.{RenderableClass, UnknownEntityException}
 
 
+/**
+ * Prepares class with required functions in required language for rendering into the text form
+ * @param storage
+ */
 class CodePreparer(val storage: FunctionsStorage) {
 
   val resolver = new DependencyResolver(storage)
@@ -16,7 +20,7 @@ class CodePreparer(val storage: FunctionsStorage) {
     val allFunctions = allDependencies.registryFunctions
     val allBuiltinToInclude = allDependencies.builtinFunctions.filter((x) => langPreparer.getBuiltin(x.id).isInstanceOf[TemplatedBuiltin])
     new RenderableClass(
-      allFunctions.map(langPreparer.prepareFunction(_)),
+      allFunctions.map(langPreparer.prepareFunction),
       allBuiltinToInclude.map(_.id)
     )
   }

@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-public class ServerStateWrapper implements InvocationHandler {
+class ServerStateWrapper implements InvocationHandler {
     private Object wrapped;
     private PalServerListener listener;
 
@@ -30,17 +30,19 @@ public class ServerStateWrapper implements InvocationHandler {
         }
         catch (InvocationTargetException e) {
             fail(e.getCause());
-            throw e.getCause();
+            throw new PalServerError(e.getCause());
         }
         catch (Throwable e) {
             fail(e);
-            throw e;
+            throw new PalServerError(e);
         }
     }
 
     private void fail(Throwable e) {
-        wasFailed = true;
-        listener.onConnectionFail(e.getMessage());
+        if (!wasFailed) {
+            wasFailed = true;
+            listener.onConnectionFail(e.getMessage());
+        }
     }
 
     public static <T> T wrap(Object obj, Class<T> kls, PalServerListener listener) {

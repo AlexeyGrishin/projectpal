@@ -41,7 +41,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
        <completion.contributor id="paljava" language="JAVA" implementationClass="io.github.alexeygrishin.pal.ideaplugin.codecompletion.BaseCompletion" order="first, before magicCompletion"/>
-       <completion.contributor id="palruby" language="RUBY" implementationClass="io.github.alexeygrishin.pal.ideaplugin.codecompletion.BaseCompletion"/>
+       <completion.contributor id="palruby" language="ruby" implementationClass="io.github.alexeygrishin.pal.ideaplugin.codecompletion.BaseCompletion" order="first"/>
   </extensions>
     <actions>
         <action id="io.github.alexeygrishin.pal.ideaplugin.ui.LookupAction"

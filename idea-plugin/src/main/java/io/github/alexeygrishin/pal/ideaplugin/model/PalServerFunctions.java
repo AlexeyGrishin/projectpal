@@ -10,7 +10,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class PalServerFunctions extends Listenable<FunctionsContainerListener> implements PalFunctions {
+/**
+ * List of pal functions from pal server
+ */
+public class PalServerFunctions implements PalFunctions {
     private List<PalFunction> knownFunctions = new LinkedList<PalFunction>();
 
     private PalServer server;
@@ -19,7 +22,6 @@ public class PalServerFunctions extends Listenable<FunctionsContainerListener> i
 
     public PalServerFunctions(PalServer server, String language) {
         this.language = language;
-        initListeners(FunctionsContainerListener.class);
         this.server = server;
         this.loading = new AtomicBoolean(false);
     }
@@ -30,7 +32,6 @@ public class PalServerFunctions extends Listenable<FunctionsContainerListener> i
 
     @Override
     public Collection<PalFunction> update(@NotNull String newFilter) {
-        listeners().onChangingStart(this);
         synchronized (this) {
             loading.set(true);
             if (newFilter.isEmpty()) {
@@ -41,7 +42,6 @@ public class PalServerFunctions extends Listenable<FunctionsContainerListener> i
             }
             loading.set(false);
         }
-        listeners().onChangingEnd(this);
         return knownFunctions;
     }
 
@@ -55,19 +55,4 @@ public class PalServerFunctions extends Listenable<FunctionsContainerListener> i
         return knownFunctions;
     }
 
-    @Override
-    public boolean canInclude(PalFunction function) {
-        return false;
-    }
-
-    @Override
-    public void setIncluded(PalFunction function, boolean include) {
-        throw new IllegalStateException("Cannot edit function in server functions snapshot");
-    }
-
-    @Override
-    protected void justAfterListenerAdded(FunctionsContainerListener listener) {
-        if (!loading.get())
-            listener.onChangingEnd(this);
-    }
 }

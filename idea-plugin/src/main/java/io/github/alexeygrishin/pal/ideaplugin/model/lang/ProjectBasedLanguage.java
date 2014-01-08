@@ -2,7 +2,7 @@ package io.github.alexeygrishin.pal.ideaplugin.model.lang;
 
 import com.intellij.openapi.project.Project;
 
-public abstract class ProjectBasedLanguage implements LangAndPlatform {
+public abstract class ProjectBasedLanguage implements LangAndPlatformEx {
     private Project project;
 
     public ProjectBasedLanguage(Project project) {
