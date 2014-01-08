@@ -4,6 +4,7 @@ What is the pal project
 It is a repository of tool functions  - those like 'capitalize', 'shortenWithEllipsis', 'parseIpv4String' etc. which present in almost every project.
 
 In the most cases developer has two alternatives:
+
 1. use 3rd-party libraries (like underscore.js or guava-libraries) even if you need 1-2 functions from them
 1. write own implementation but spend the time on it and probably get less quality code
 
